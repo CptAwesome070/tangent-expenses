@@ -1,0 +1,36 @@
+<ion-navbar *navbar>
+  <ion-title>
+    Home
+  </ion-title>
+</ion-navbar>
+
+<ion-content class="home" >
+  <ion-fab top right #fabC>
+    <button ion-fab mini><ion-icon name="add"></ion-icon></button>
+    <ion-fab-list>
+      <button ion-fab (click)="takePicture(fabC)"><ion-icon name="camera"></ion-icon></button>
+      <button ion-fab (click)="performOCR(fabC)"><ion-icon name="logo-googleplus"></ion-icon></button>
+    </ion-fab-list>
+  </ion-fab>
+
+  <ion-fab left bottom #fabP>
+    <button ion-fab color="light"><ion-icon name="ios-people"></ion-icon></button>
+    <ion-fab-list side="top">
+      <button ion-fab color="primary" (click)="promptUser(fabP)">NEW</button>
+      <button ion-fab (press)="userAlert(person)" [style.background-color]="person.colour" style="color: #FFF; text-shadow:-0.5px -0.5px 0 #000,0.5px -0.5px 0 #000,-0.5px 0.5px 0 #000,0.5px 0.5px 0 #000;  " *ngFor="let person of people" (click)="selectPerson(person,fabP)">{{person.initials}}</button>
+
+    </ion-fab-list>
+  </ion-fab>
+
+  <canvas id="tempCanvas" (tap)="tapEvent($event)" (press)="pressEvent($event)"></canvas>
+
+  <!--<ion-card>
+    <ion-card-content >
+
+
+
+
+
+    </ion-card-content>
+  </ion-card>-->
+</ion-content>
