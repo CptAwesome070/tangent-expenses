@@ -8,9 +8,8 @@
   <ion-fab top right #fabC>
     <button ion-fab mini><ion-icon name="add"></ion-icon></button>
     <ion-fab-list>
-      <button ion-fab (click)="takePicture(fabC)"><ion-icon name="camera"></ion-icon></button>
-      <!-- Test -->
-      <!--<button ion-fab (click)="performOCR(fabC)"><ion-icon name="logo-googleplus"></ion-icon></button>-->
+      <button ion-fab (click)="fabPicture(fabC)"><ion-icon name="camera"></ion-icon></button>
+      <button ion-fab (click)="sendExpense(fabC)"><ion-icon name="mail"></ion-icon></button>
     </ion-fab-list>
   </ion-fab>
 
@@ -23,6 +22,6 @@
 
     </ion-fab-list>
   </ion-fab>
-
+  <img *ngIf="!base64Image" (click)="takePicture()" src="assets/media/camera_2.png"/>
   <canvas id="tempCanvas" (tap)="tapEvent($event)" (press)="pressEvent($event)"></canvas>
 </ion-content>

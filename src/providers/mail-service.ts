@@ -9,15 +9,16 @@ export class MailService {
 
 
   constructor(public http: Http) {
+
+  }
+
+
+  sendExpense(expense) {
     EmailComposer.isAvailable().then((available: boolean) =>{
       if(available) {
         //Now we know we can send
       }
     });
-  }
-
-
-  sendExpense(expense) {
     var body = expense.descirption + "</br>";
     for(let item of expense.items.items){
       body += item.description +": R"+ item.total + "</br>";

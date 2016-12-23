@@ -2,11 +2,12 @@
   <ion-row class="logo-row">
     <ion-col></ion-col>
     <ion-col width-67>
-      <img src="../../assets/media/tangent-solutions-logo.png"/>
+      <img src="assets/media/tangent-solutions-logo.png"/>
     </ion-col>
     <ion-col></ion-col>
   </ion-row>
   <div class="login-box">
+    <ion-item *ngIf="error">{{error}}</ion-item>
     <ion-list>
 
       <ion-item>

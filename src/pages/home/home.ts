@@ -48,12 +48,20 @@ export class HomePage {
 
     }
 
-    takePicture(fab: FabContainer) {
+    fabPicture(fab: FabContainer) {
       fab.close();
+      this.takePicture();
+    }
+
+    takePicture(){
+        Camera.EncodingType.JPEG;
         Camera.getPicture({
             destinationType: Camera.DestinationType.DATA_URL,
-            targetWidth: 1000,
-            targetHeight: 1000
+            targetWidth: 600,
+            targetHeight: 600,
+            quality: 60,
+            correctOrientation: true,
+            allowEdit: true,
         }).then((imageData) => {
           this.base64Image = imageData;
           //var image = "images/1.png";
@@ -78,14 +86,6 @@ export class HomePage {
             );
           }
           image.src =this.image;
-            // imageData is a base64 encoded string
-            //this.base64Image = "data:image/jpeg;base64," + imageData;
-
-            /*this.billService.postImage(imageData).then(
-             data => {
-             console.log(data)
-             }
-             );*/
         });
     }
 
@@ -413,6 +413,10 @@ export class HomePage {
       buttons: ['OK', 'MODIFY']
     });
     alert.present();
+  }
+
+  sendExpense(fab: FabContainer){
+    fab.close();
   }
 
 }
