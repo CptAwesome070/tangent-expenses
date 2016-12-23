@@ -5,12 +5,14 @@ import { HomePage } from '../pages/home/home';
 import {LoginPage} from '../pages/login/login';
 import { AuthService } from '../providers/auth-service';
 import { NavController } from 'ionic-angular';
+import {ExpensesPage} from "../pages/expenses/expenses";
 
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
-    LoginPage
+    LoginPage,
+    ExpensesPage
   ],
   imports: [
     IonicModule.forRoot(MyApp)
@@ -19,7 +21,8 @@ import { NavController } from 'ionic-angular';
   entryComponents: [
     MyApp,
     HomePage,
-    LoginPage
+    LoginPage,
+    ExpensesPage
   ],
   providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}]
 })

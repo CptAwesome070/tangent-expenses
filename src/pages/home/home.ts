@@ -24,10 +24,15 @@ export class HomePage {
     public canvas: HTMLCanvasElement;
     public regions: any[];
     private lines = [];
+    private lineItems = [];
     private people = [];
+    private expenseDescription: String;
     private newText = [];
     private selPerson = null;
+    private selLineItem = null;
     private loadingPopup;
+    private action = null;
+    private total = {descirption: "total", value: 0};
 
     constructor(private billService: BillService, private authService: AuthService, private nav: NavController, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
         this.contentType = "image/png";
@@ -39,6 +44,8 @@ export class HomePage {
       if(!authService.checkAuth()){
         this.nav.setRoot(LoginPage);
       }
+
+
     }
 
     takePicture(fab: FabContainer) {
@@ -74,14 +81,8 @@ export class HomePage {
           ctx.beginPath();
           ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
           var dataURL = canvas.toDataURL();
-          console.log(ctx.getImageData(0,0,canvas.width,canvas.height));
-
           dataString = dataURL.split(",").pop();
-          //console.log(dataString);
-          console.log("here2");
           var blob = this.b64toBlob(dataString, this.contentType, 512);
-          //console.log(blob);
-          //console.log("here3");
           this.loadingPopup.present();
           this.billService.postImage(blob).subscribe(
             data => this.result = data,
@@ -89,18 +90,13 @@ export class HomePage {
             () => this.setCanvas(),
           );
         }
-
       image.src =this.image;
-
-
-
     }
 
     setCanvas(){
       this.loadingPopup.dismiss();
+      this.promptDescription();
       var regions = this.result.regions;
-      //console.log(this.result);
-      //this.lines = this.result.regions[0].lines;
       this.canvas = <HTMLCanvasElement> document.getElementById('tempCanvas');
       this.canvas.width  = window.innerWidth;
       this.canvas.height = window.innerHeight;
@@ -111,11 +107,8 @@ export class HomePage {
       var templines = this.lines;
       var canvas = this.canvas;
       image.onload = function() {
-        // draw image
         ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-        //set line bounding boxes
         for(let region of regions){
-          //console.log("______region_____");
           for(let line of region.lines) {
             var tmpBounds = line.boundingBox;
             var boundries = tmpBounds.split(',');
@@ -125,7 +118,6 @@ export class HomePage {
         }
       };
       image.src ="data:image/jpeg;base64," +this.base64Image;
-        //ctx.drawImage(blob, 0, 0, width, height);
     }
 
     //compileRegions(){
@@ -156,10 +148,22 @@ export class HomePage {
         return blob;
     }
 
-  promptUser(fab: FabContainer) {
+    promptItem(fab: FabContainer) {
+      fab.close();
+      var letters = '0123456789ABCDEF';
+      var color = '#';
+      for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      this.selLineItem = {description:null, total:0, colour: color};
+      this.lineItems.push( this.selLineItem);
+      this.action = "description";
+    }
+
+  /*promptItem(fab: FabContainer) {
     fab.close();
     let prompt = this.alertCtrl.create({
-      title: 'Person',
+      title: 'Line Item',
       message: "Enter the initials of the person",
       inputs: [
         {
@@ -194,13 +198,24 @@ export class HomePage {
       ]
     });
     prompt.present();
-  }
+  }*/
+  selectItem(lineItem, fab: FabContainer){
+    fab.close();
+    this.selLineItem = lineItem;
+    this.action = "description";
 
-  selectPerson(person, fab: FabContainer){
+  }
+  selectTotal( fab: FabContainer){
+    fab.close();
+    this.selLineItem = null;
+    this.action = "total";
+
+  }
+  /*selectPerson(person, fab: FabContainer){
     fab.close();
     this.selPerson = person;
     //console.log(this.selPerson);
-  }
+  }*/
 
     tapEvent(e) {
       //console.log(e);
@@ -210,44 +225,59 @@ export class HomePage {
       if(this.result != null){
         let ctx: CanvasRenderingContext2D = this.canvas.getContext("2d");
         for(let region of this.result.regions) {
-          //console.log("______region_____");
           for (let line of region.lines) {
             var lineBounds = line.boundingBox;
             var lineBoundries = lineBounds.split(',');
             // if click is within the boundries
             if(centerX>=parseInt(lineBoundries[0]) && centerX<= (parseInt(lineBoundries[0])+parseInt(lineBoundries[2])) && centerY>=parseInt(lineBoundries[1]) && centerY<= (parseInt(lineBoundries[1])+parseInt(lineBoundries[3]))){
               ctx.beginPath();
-              if(this.selPerson != null){
-                ctx.strokeStyle = this.selPerson.colour;
-
+              if(this.action != null){
+                ctx.strokeStyle = this.selLineItem.colour;
               }
               else {
                 ctx.strokeStyle = "blue";
               }
-              //ctx.strokeWidth = 15;
               ctx.lineWidth = 3;
               ctx.strokeRect(lineBoundries[0],lineBoundries[1],lineBoundries[2],lineBoundries[3]);
-              //console.log(line);
               foundText = true;
-              // check for lfoating point numbers in each block
-              //console.log(line);
-              for (let word of line.words) {
-                if(parseFloat(word.text) != null){
-                  //console.log(parseFloat(word.text));
-                  if(this.selPerson != null){
-                    if(!isNaN(parseFloat(word.text))){
-                      this.selPerson.amounts.push({text:word.text, x: lineBoundries[0], y: lineBoundries[1], width: lineBoundries[2], height:lineBoundries[3]});
+              if(this.action != null && this.action === "description"){
+                this.selLineItem.description = "";
+                for (let word of line.words) {
+                  this.selLineItem.description += word.text +" ";
+                }
+                this.action="value";
+              }
+              if(this.action != null && this.action === "value")
+                for (let word of line.words) {
+                  if (parseFloat(word.text) != null) {
+                    //console.log(parseFloat(word.text));
+                    if (this.selLineItem != null) {
+                      if (!isNaN(parseFloat(word.text))) {
+                        this.selLineItem.total = parseFloat(word.text);
+                        this.selLineItem = null;
+                        this.action = null;
+                      }
                     }
-
+                  }
+                }
+              }
+              if(this.action != null && this.action === "total")
+                for (let word of line.words) {
+                  if (parseFloat(word.text) != null) {
+                    //console.log(parseFloat(word.text));
+                    if (this.selLineItem != null) {
+                      if (!isNaN(parseFloat(word.text))) {
+                        this.total.value = parseFloat(word.text);
+                        //this.selLineItem = null;
+                        this.action = null;
+                      }
+                    }
                   }
                 }
 
-
-              }
             }
           }
         }
-      }
       if(!foundText ==true ){
         console.log("notfound");
       }
@@ -258,40 +288,30 @@ export class HomePage {
     }
 
     pressEvent(e){
-      //console.log(e);
       var centerX = e.center.x;
       var centerY = e.center.y;
       var foundText = false;
       if(this.result != null){
         let ctx: CanvasRenderingContext2D = this.canvas.getContext("2d");
         for(let region of this.result.regions) {
-          //console.log("______region_____");
           for (let line of region.lines) {
             var lineBounds = line.boundingBox;
             var lineBoundries = lineBounds.split(',');
-            // if click is within the boundries
             if(centerX>=parseInt(lineBoundries[0]) && centerX<= (parseInt(lineBoundries[0])+parseInt(lineBoundries[2])) && centerY>=parseInt(lineBoundries[1]) && centerY<= (parseInt(lineBoundries[1])+parseInt(lineBoundries[3]))){
               ctx.beginPath();
               if(this.selPerson != null){
                 ctx.strokeStyle = this.selPerson.colour;
-
               }
               else {
                 ctx.strokeStyle = "blue";
               }
-              //ctx.strokeWidth = 15;
               ctx.lineWidth = 3;
               ctx.strokeRect(lineBoundries[0],lineBoundries[1],lineBoundries[2],lineBoundries[3]);
-              //console.log(line);
               foundText = true;
-              // check for lfoating point numbers in each block
-              //console.log(line);
               for (let word of line.words) {
                 if(!isNaN(word.text)){
                   console.log(parseFloat(word.text));
                 }
-
-
               }
             }
           }
@@ -353,23 +373,53 @@ export class HomePage {
     prompt.present();
   }
 
+  promptDescription() {
+    let prompt = this.alertCtrl.create({
+      title: 'Description',
+      message: "A description for this expense",
+      inputs: [
+        {
+          name: 'description',
+          placeholder: 'Brief Description'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Save',
+          handler: data => {
+            this.expenseDescription = data.value;
+          }
+        }
+      ]
+    });
+    prompt.present();
+  }
 
-  userAlert(p) {
 
+  itemAlert(item) {
     var subtitle = "";
     var total = 0;
-    console.log(p.amounts);
-    for(let amount of p.amounts){
-      console.log(amount);
-      subtitle += amount.text ;
-      total = total+ parseFloat(amount.text);
-    }
-    console.log(total);
-    subtitle += "Total: "+ total;
 
     let alert = this.alertCtrl.create({
-      title: p.initials,
-      subTitle: subtitle,
+      //title: item.description,
+      subTitle: item.description+ " = "+item.total,
+      buttons: ['OK', 'MODIFY']
+    });
+    alert.present();
+  }
+  totalAlert() {
+    var subtitle = "";
+    var total = 0;
+
+    let alert = this.alertCtrl.create({
+      title: 'Total',
+      subTitle: this.total.value + "",
       buttons: ['OK', 'MODIFY']
     });
     alert.present();

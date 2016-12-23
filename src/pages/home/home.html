@@ -14,10 +14,11 @@
   </ion-fab>
 
   <ion-fab left bottom #fabP>
-    <button ion-fab color="light"><ion-icon name="ios-people"></ion-icon></button>
+    <button ion-fab color="light"><ion-icon name="archive"></ion-icon></button>
     <ion-fab-list side="top">
-      <button ion-fab color="primary" (click)="promptUser(fabP)">NEW</button>
-      <button ion-fab (press)="userAlert(person)" [style.background-color]="person.colour" style="color: #FFF; text-shadow:-0.5px -0.5px 0 #000,0.5px -0.5px 0 #000,-0.5px 0.5px 0 #000,0.5px 0.5px 0 #000;  " *ngFor="let person of people" (click)="selectPerson(person,fabP)">{{person.initials}}</button>
+      <button ion-fab color="primary" (click)="promptItem(fabP)">NEW</button>
+      <button ion-fab color="danger" (press)="totalAlert()"  style="color: #FFF; text-shadow:-0.5px -0.5px 0 #000,0.5px -0.5px 0 #000,-0.5px 0.5px 0 #000,0.5px 0.5px 0 #000;  " (click)="selectTotal(fabP)">{{Total}}</button>
+      <button ion-fab (press)="itemAlert(item)" [style.background-color]="item.colour" style="color: #FFF; text-shadow:-0.5px -0.5px 0 #000,0.5px -0.5px 0 #000,-0.5px 0.5px 0 #000,0.5px 0.5px 0 #000;  " *ngFor="let item of lineItems; let i = index" (click)="selectItem(item,fabP)">{{i}}</button>
 
     </ion-fab-list>
   </ion-fab>
