@@ -1,6 +1,6 @@
 <ion-navbar *navbar>
   <ion-title>
-    Home
+    New Expense
   </ion-title>
 </ion-navbar>
 
@@ -17,21 +17,11 @@
     <button ion-fab color="light"><ion-icon name="archive"></ion-icon></button>
     <ion-fab-list side="top">
       <button ion-fab color="primary" (click)="promptItem(fabP)">NEW</button>
-      <button ion-fab color="danger" (press)="totalAlert()"  style="color: #FFF; text-shadow:-0.5px -0.5px 0 #000,0.5px -0.5px 0 #000,-0.5px 0.5px 0 #000,0.5px 0.5px 0 #000;  " (click)="selectTotal(fabP)">{{Total}}</button>
+      <button ion-fab color="danger" (press)="totalAlert()"  style="color: #FFF; text-shadow:-0.5px -0.5px 0 #000,0.5px -0.5px 0 #000,-0.5px 0.5px 0 #000,0.5px 0.5px 0 #000;  " (click)="selectTotal(fabP)">T</button>
       <button ion-fab (press)="itemAlert(item)" [style.background-color]="item.colour" style="color: #FFF; text-shadow:-0.5px -0.5px 0 #000,0.5px -0.5px 0 #000,-0.5px 0.5px 0 #000,0.5px 0.5px 0 #000;  " *ngFor="let item of lineItems; let i = index" (click)="selectItem(item,fabP)">{{i}}</button>
 
     </ion-fab-list>
   </ion-fab>
 
   <canvas id="tempCanvas" (tap)="tapEvent($event)" (press)="pressEvent($event)"></canvas>
-
-  <!--<ion-card>
-    <ion-card-content >
-
-
-
-
-
-    </ion-card-content>
-  </ion-card>-->
 </ion-content>

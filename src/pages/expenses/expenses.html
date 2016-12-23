@@ -20,12 +20,12 @@
 
 <ion-content padding>
   <ion-list>
-    <ion-item>
+    <ion-item *ngFor="let expense of expenses">
       <ion-avatar item-left>
-        <img src="img/avatar-cher.png">
+        <img [src]="expense.image">
       </ion-avatar>
-      <h2>Cher</h2>
-      <p>Ugh. As if.</p>
+      <h2>{{expense.description}}</h2>
+      <p>{{expense.date}}</p>
 
       <button ion-button round item-right><ion-icon name="mail"></ion-icon></button>
     </ion-item>

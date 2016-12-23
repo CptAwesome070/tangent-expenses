@@ -32,7 +32,7 @@ export class HomePage {
     private selLineItem = null;
     private loadingPopup;
     private action = null;
-    private total = {descirption: "total", value: 0};
+    private total = {descirption: "total", value: 0, colour: "#FF0000"};
 
     constructor(private billService: BillService, private authService: AuthService, private nav: NavController, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
         this.contentType = "image/png";
@@ -160,45 +160,6 @@ export class HomePage {
       this.action = "description";
     }
 
-  /*promptItem(fab: FabContainer) {
-    fab.close();
-    let prompt = this.alertCtrl.create({
-      title: 'Line Item',
-      message: "Enter the initials of the person",
-      inputs: [
-        {
-          name: 'initials',
-          placeholder: 'Initials'
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          handler: data => {
-            console.log('Cancel clicked');
-          }
-        },
-        {
-          text: 'Save',
-          handler: data => {
-            var letters = '0123456789ABCDEF';
-            var color = '#';
-            for (var i = 0; i < 6; i++ ) {
-              color += letters[Math.floor(Math.random() * 16)];
-            }
-            var init = data.initials.substring(0,3);
-
-            //console.log(init.toUpperCase());
-            var person = {initials: init.toUpperCase(), colour: color, amounts : []}
-            this.people.push(person);
-            this.selPerson = person;
-            //console.log(data);
-          }
-        }
-      ]
-    });
-    prompt.present();
-  }*/
   selectItem(lineItem, fab: FabContainer){
     fab.close();
     this.selLineItem = lineItem;
@@ -211,14 +172,8 @@ export class HomePage {
     this.action = "total";
 
   }
-  /*selectPerson(person, fab: FabContainer){
-    fab.close();
-    this.selPerson = person;
-    //console.log(this.selPerson);
-  }*/
 
     tapEvent(e) {
-      //console.log(e);
       var centerX = e.center.x;
       var centerY = e.center.y;
       var foundText = false;
@@ -232,7 +187,11 @@ export class HomePage {
             if(centerX>=parseInt(lineBoundries[0]) && centerX<= (parseInt(lineBoundries[0])+parseInt(lineBoundries[2])) && centerY>=parseInt(lineBoundries[1]) && centerY<= (parseInt(lineBoundries[1])+parseInt(lineBoundries[3]))){
               ctx.beginPath();
               if(this.action != null){
-                ctx.strokeStyle = this.selLineItem.colour;
+                if(this.selLineItem != null){
+                  ctx.strokeStyle = this.selLineItem.colour;
+                }else{
+                  ctx.strokeStyle = this.total.colour;
+                }
               }
               else {
                 ctx.strokeStyle = "blue";
@@ -246,6 +205,7 @@ export class HomePage {
                   this.selLineItem.description += word.text +" ";
                 }
                 this.action="value";
+                break;
               }
               if(this.action != null && this.action === "value")
                 for (let word of line.words) {
@@ -256,6 +216,7 @@ export class HomePage {
                         this.selLineItem.total = parseFloat(word.text);
                         this.selLineItem = null;
                         this.action = null;
+                        break;
                       }
                     }
                   }
@@ -319,10 +280,8 @@ export class HomePage {
       }
       if(!foundText ==true ){
         this.promptInput(e);
-        console.log("notfound");
       }
       else{
-        console.log("found text here");
         foundText = false;
       }
     }
@@ -351,21 +310,28 @@ export class HomePage {
             let ctx: CanvasRenderingContext2D = this.canvas.getContext("2d");
             ctx.font = "18pt Arial";
             var width = ctx.measureText(data.value).width;
-            if(this.selPerson != null){
-              ctx.strokeStyle = this.selPerson.colour;
-              if(this.selPerson != null){
-                this.selPerson.amounts.push({text:data.value, x: e.center.x, y: e.center.y, width: width, height:15});
-              }
+            if(this.selLineItem != null && this.action === "value"){
+              console.log("value");
+              ctx.strokeStyle = this.selLineItem.colour;
+              console.log(this.selLineItem.colour);
+              this.selLineItem.total = parseFloat(data.value);
+              this.action = null;
             }
-            else {
-              ctx.strokeStyle = "blue";
+            if(this.action === "total"){
+              this.total.value = parseFloat(data.value);
+              ctx.strokeStyle = this.total.colour;
+              this.action = null;
+            }
+            if(this.action === "null") {
+              ctx.strokeStyle = "#000";
             }
             ctx.lineWidth = 0.1;
-
-            //console.log(ctx.measureText(data.value));
             ctx.fillText(data.value, e.center.x, e.center.y);
+            console.log("shoudl be drawing rectangle");
+            ctx.beginPath();
+            ctx.lineWidth = 3;
+            ctx.strokeRect(e.center.x,e.center.y-23,width,25);
             this.newText.push({text:data.value, x: e.center.x, y: e.center.y, width: width, height:15});
-
           }
         }
       ]
@@ -413,6 +379,7 @@ export class HomePage {
     });
     alert.present();
   }
+
   totalAlert() {
     var subtitle = "";
     var total = 0;
