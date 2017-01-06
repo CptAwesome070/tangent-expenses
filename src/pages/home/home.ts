@@ -54,10 +54,10 @@ export class HomePage {
     }
 
     takePicture(){
-        Camera.EncodingType.JPEG;
+        Camera.EncodingType.PNG;
         Camera.getPicture({
             destinationType: Camera.DestinationType.DATA_URL,
-            targetWidth: 600,
+            targetWidth: 800,
             targetHeight: 600,
             quality: 60,
             correctOrientation: true,
@@ -74,7 +74,10 @@ export class HomePage {
           var dataString = null;
           image.onload = () => {
             ctx.beginPath();
+            //ctx.translate(canvas.width, canvas.height);
             ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            //ctx.rotate(180 * Math.PI / 180);
+            //ctx.drawImage(image, 0, 0);
             var dataURL = canvas.toDataURL();
             dataString = dataURL.split(",").pop();
             var blob = this.b64toBlob(dataString, this.contentType, 512);

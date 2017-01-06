@@ -32,16 +32,25 @@ export class AuthService {
     return new Promise(resolve => {
 
       this.http.post('http://userservice.staging.tangentmicroservices.com:80/api-token-auth/', creds, {headers: headers}).subscribe(data => {
-        //console.log(data);
+        console.log(data);
         if (data.status === 200) {
           window.localStorage.setItem('token', data.json().token);
 
           this.isLoggedin = true;
           this.nav.setRoot(HomePage);
         }
+        if(data.status === 200){
+          return "error";
+        }
         resolve(this.isLoggedin);
 
-      });
+      },
+        err => {
+          // Log errors if any
+          console.log(err);
+          return err;
+        }
+      );
 
     });
 

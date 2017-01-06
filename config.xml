@@ -35,4 +35,5 @@
   <plugin name="cordova-plugin-statusbar" spec="~2.2.1"/>
   <plugin name="ionic-plugin-keyboard" spec="~2.2.1"/>
   <allow-navigation href="http://10.33.0.173:8100"/>
+  <allow-navigation href="http://192.168.47.102:8100"/>
 </widget>
